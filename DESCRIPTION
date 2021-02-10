@@ -1,0 +1,14 @@
+Package: compp
+Title: COM-Poisson point process
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Ian",
+           family = "Flint",
+           role = c("aut", "cre"),
+           email = "ian.flint@unimelb.edu.au")
+Description: Fitting functions for the COM-Poisson point process
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
