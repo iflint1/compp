@@ -6,7 +6,7 @@ Authors@R:
            family = "Flint",
            role = c("aut", "cre"),
            email = "ian.flint@unimelb.edu.au")
-Description: Fitting functions for the COM-Poisson point process
+Description: Simulation and Fitting functions for the COM-Poisson point process.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
