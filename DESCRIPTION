@@ -8,6 +8,10 @@ Authors@R:
            email = "ian.flint@unimelb.edu.au")
 Description: Simulation and Fitting functions for the COM-Poisson point process.
 License: MIT + file LICENSE
+Imports: 
+    COMPoissonReg,
+    spatstat
+Depends: R (>= 2.10.0)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
