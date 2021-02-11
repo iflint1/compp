@@ -12,6 +12,7 @@ Imports:
     methods,
     raster,
     Rcpp,
+    rgdal,
     spatstat
 Depends: COMPoissonReg,
          R (>= 2.10.0)

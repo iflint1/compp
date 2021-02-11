@@ -7,6 +7,7 @@
 #'
 #' @return List with two elements: the actual `spatstat` fit, and the corresponding coefficient estimates.
 #'
+#' @import rgdal
 #' @importFrom methods is
 #' @importFrom raster extract
 #' @importFrom spatstat coef.ppm ppm.quad quadscheme.logi superimpose
