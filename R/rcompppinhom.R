@@ -44,7 +44,7 @@ draw_points <- function(total_points,
 #' rather than a list containing a single point pattern.
 #' @param use_cpp Use C++ version of the code?
 #'
-#' @return List of `spatstat::ppp` samples of a homogeneous COM-Poisson point process.
+#' @return List of `spatstat::ppp` samples of an inhomogeneous COM-Poisson point process.
 #'
 #' @import COMPoissonReg
 #' @importFrom spatstat area.owin owin ppp runifpoint

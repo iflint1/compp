@@ -37,7 +37,7 @@ rather than a list containing a single point pattern.}
 \item{use_cpp}{Use C++ version of the code?}
 }
 \value{
-List of \code{spatstat::ppp} samples of a homogeneous COM-Poisson point process.
+List of \code{spatstat::ppp} samples of an inhomogeneous COM-Poisson point process.
 }
 \description{
 Inhomogeneous COM-Poisson point process simulation
