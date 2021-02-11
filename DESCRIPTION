@@ -9,6 +9,8 @@ Authors@R:
 Description: Simulation and Fitting functions for the COM-Poisson point process.
 License: MIT + file LICENSE
 Imports: 
+    methods,
+    raster,
     Rcpp,
     spatstat
 Depends: COMPoissonReg,
