@@ -34,8 +34,8 @@ rcomfitlogit <- function(configurations, force_nu, covariates = list(), ndummy =
 
   # Create the quadrature scheme and dummy points
   quadrature_scheme <- quadscheme.logi(data = complete_configuration,
-                                                 nd = c(ndummy, N),
-                                                 dummytype = "binomial")
+                                       nd = c(ndummy, N),
+                                       dummytype = "binomial")
   dummy <- quadrature_scheme$dummy
 
   # This is not equal to ndummy if the window is an `im`
