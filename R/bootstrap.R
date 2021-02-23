@@ -21,16 +21,22 @@ bootstrap <- function(N,
                       nthreads = 1,
                       alpha = 0.05) {
   lambda  <- exp(estimate[match("(Intercept)", names(estimate))])
-  samples <- rcomppp(n = n * N,
-                     lambda = lambda,
-                     nu = estimate[match("nu", names(estimate))],
-                     window = window)
 
   # Parallel section
+  varlist <- c("n", "libpath")
+  libpath <- .libPaths()
   cl <- makeCluster(nthreads)
-  clusterExport(cl, varlist = c("rcomfitlogit", "samples"))
-  coefs <- parLapply(cl = cl, seq_len(N), function(n) {
-    rcomfitlogit(samples[(1 + (i - 1) * n):(i * n)], ndummy = ndummy)$coef
+  clusterExport(cl, varlist = varlist, envir = environment())
+  coefs <- parLapply(cl = cl, seq_len(N), function(i) {
+    .libPaths(libpath)
+
+    require(COMPoissonReg)
+
+    samples <- rcomppp(n = n,
+                       lambda = lambda,
+                       nu = estimate[match("nu", names(estimate))],
+                       window = window)
+    rcomfitlogit(samples, ndummy = ndummy)$coef
   })
   stopCluster(cl)
 

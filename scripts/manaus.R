@@ -1,6 +1,9 @@
+library(compp)
 library(ggplot2)
 library(scales)
 library(spatstat)
+
+set.seed(1)
 
 manaus <- read.csv("data-raw/manaus.csv")
 
@@ -46,7 +49,7 @@ ggplot(df, aes(x = year, y = month, fill = flood)) +
 
 
 configurations <- lapply(seq(from = range[1], to = range[2], by = 1), function(year) {
-  if(year %in% crude_flood_years) {
+  if(year %in% flood_years) {
     index <- which.max(manaus$value[manaus$time >= year & manaus$time < year + 1])
     spatstat::ppp(x = manaus$time[manaus$time >= year & manaus$time < year + 1][index] - year,
                   y = runif(1),
@@ -57,3 +60,5 @@ configurations <- lapply(seq(from = range[1], to = range[2], by = 1), function(y
 })
 
 fit <- rcomfitlogit(configurations, covariates = list(), ndummy = 1e4)
+
+b <- bootstrap(N = 1000, n = length(configurations), estimate = fit$coef, nthreads = 4)
