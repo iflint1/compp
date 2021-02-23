@@ -1,25 +1,54 @@
+library(ggplot2)
+library(scales)
 library(spatstat)
 
 manaus <- read.csv("data-raw/manaus.csv")
 
 range <- c(1903, 1992)
 
-crude_flood_years <- c(1904, 1908, 1909, 1913, 1918,
-                       1920, 1921, 1922, 1944, 1953,
-                       1955, 1971, 1972, 1973, 1975,
-                       1976, 1982, 1989)
+flood_years <- c(1904, 1908, 1909, 1913, 1918,
+                 1920, 1921, 1922, 1944, 1953,
+                 1955, 1971, 1972, 1973, 1975,
+                 1976, 1982, 1989)
 
 
-flood_years <- sapply(crude_flood_years, function(year) {
+flood_months <- sapply(flood_years, function(year) {
   index <- which.max(manaus$value[manaus$time >= year & manaus$time < year + 1])
-  manaus$time[manaus$time >= year & manaus$time < year + 1][index]
+  as.integer((manaus$time[manaus$time >= year & manaus$time < year + 1][index] - year) * 12)
 })
 
-plot(flood_years, rep(1, length(flood_years)))
+df <- data.frame(year = rep(seq(from = range[1], to = range[2], by = 1), each = 12),
+                 month = rep(1:12, range[2] - range[1] + 1))
+df$flood <- sapply(seq_len(nrow(df)), function(n) {
+  index <- which(df$year[n] == flood_years)
+  if(length(index) > 0) {
+    df$month[n] == flood_months[index]
+  } else {
+    FALSE
+  }
+})
+
+df$month <- factor(df$month)
+levels(df$month) <- month.abb
+
+df$flood <- factor(df$flood)
+levels(df$flood) <- c("No flood", "Flood")
+
+ggplot(df, aes(x = year, y = month, fill = flood)) +
+  geom_tile() +
+  scale_y_discrete(limits = month.abb[length(month.abb):1]) +
+  scale_x_continuous(breaks = seq(from = range[1], to = range[2], by = 10)) +
+  scale_fill_manual(name = "", values = c('grey', 'blue')) +
+  xlab("Year") +
+  ylab("Month") +
+  ggtitle("Flooding in Rio Negro by month") +
+  theme_minimal()
+
 
 configurations <- lapply(seq(from = range[1], to = range[2], by = 1), function(year) {
   if(year %in% crude_flood_years) {
-    spatstat::ppp(x = flood_years[flood_years >= year & flood_years < year + 1] - year,
+    index <- which.max(manaus$value[manaus$time >= year & manaus$time < year + 1])
+    spatstat::ppp(x = manaus$time[manaus$time >= year & manaus$time < year + 1][index] - year,
                   y = runif(1),
                   window = spatstat::owin())
   } else {
