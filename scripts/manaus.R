@@ -59,8 +59,10 @@ configurations <- lapply(seq(from = range[1], to = range[2], by = 1), function(y
   }
 })
 
+set.seed(1)
 fit <- rcomfitlogit(configurations, covariates = list(), ndummy = 1e4)
 b <- bootstrap(N = 10000, n = length(configurations), estimate = fit$coef, nthreads = 4)
 
+set.seed(1)
 fit_ppp <- rcomfitlogit(configurations, covariates = list(), force_nu = 1, ndummy = 1e4)
 b_ppp <- bootstrap(N = 10000, n = length(configurations), estimate = fit_ppp$coef, nthreads = 4, force_nu = 1)
