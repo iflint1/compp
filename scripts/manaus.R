@@ -40,11 +40,11 @@ levels(df$flood) <- c("No flood", "Flood")
 ggplot(df, aes(x = year, y = month, fill = flood)) +
   geom_tile() +
   scale_y_discrete(limits = month.abb[length(month.abb):1]) +
-  scale_x_continuous(breaks = seq(from = range[1], to = range[2], by = 10)) +
+  scale_x_continuous(breaks = seq(from = range[1], to = range[2], by = 4)) +
   scale_fill_manual(name = "", values = c('grey', 'blue')) +
   xlab("Year") +
   ylab("Month") +
-  ggtitle("Flooding in Rio Negro by month") +
+  ggtitle("Flooding of Rio Negro river by month") +
   theme_minimal()
 
 
@@ -60,5 +60,7 @@ configurations <- lapply(seq(from = range[1], to = range[2], by = 1), function(y
 })
 
 fit <- rcomfitlogit(configurations, covariates = list(), ndummy = 1e4)
+b <- bootstrap(N = 10000, n = length(configurations), estimate = fit$coef, nthreads = 4)
 
-b <- bootstrap(N = 1000, n = length(configurations), estimate = fit$coef, nthreads = 4)
+fit_ppp <- rcomfitlogit(configurations, covariates = list(), force_nu = 1, ndummy = 1e4)
+b_ppp <- bootstrap(N = 10000, n = length(configurations), estimate = fit_ppp$coef, nthreads = 4, force_nu = 1)

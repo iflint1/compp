@@ -5,6 +5,7 @@
 #' @param estimate Vector of coefficient estimates obtained by a fitting procedure.
 #' @param window Observation window.
 #' @param ndummy Number of dummy points used in the calls to the logistic regression.
+#' @param force_nu Force nu to a given value?
 #' @param nthreads Number of CPU threads to use.
 #' @param alpha Probability to use in the bootstrap CIs.
 #'
@@ -18,8 +19,20 @@ bootstrap <- function(N,
                       estimate,
                       window = owin(),
                       ndummy = 1e4,
+                      force_nu,
                       nthreads = 1,
                       alpha = 0.05) {
+  if(!missing(force_nu)) {
+    nu <- force_nu
+  } else if(is.na(match('nu', names(estimate)))) {
+    nu <- 1
+  } else {
+    nu <- estimate[match('nu', names(estimate))]
+  }
+  if(missing(force_nu)) {
+    force_nu <- NA
+  }
+
   lambda  <- exp(estimate[match("(Intercept)", names(estimate))])
 
   # Parallel section
@@ -34,9 +47,14 @@ bootstrap <- function(N,
 
     samples <- rcomppp(n = n,
                        lambda = lambda,
-                       nu = estimate[match("nu", names(estimate))],
+                       nu = nu,
                        window = window)
-    rcomfitlogit(samples, ndummy = ndummy)$coef
+    if(is.na(force_nu)) {
+      rcomfitlogit(samples, ndummy = ndummy)$coef
+    } else {
+      rcomfitlogit(samples, ndummy = ndummy, force_nu = force_nu)$coef
+    }
+
   })
   stopCluster(cl)
 

@@ -40,7 +40,7 @@ bootstrapinhom(
 
 \item{nthreads}{Number of CPU threads to use.}
 
-\item{force_nu}{For nu to a given value?}
+\item{force_nu}{Force nu to a given value?}
 
 \item{parallel}{Use faster parallel version?}
 }

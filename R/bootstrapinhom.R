@@ -10,7 +10,7 @@
 #' @param ndummy Number of dummy points used in the calls to the logistic regression.
 #' @param alpha Probability to use in the bootstrap CIs.
 #' @param nthreads Number of CPU threads to use.
-#' @param force_nu For nu to a given value?
+#' @param force_nu Force nu to a given value?
 #' @param parallel Use faster parallel version?
 #'
 #' @return List containing bootstrap bias, and CIs.

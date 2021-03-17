@@ -10,6 +10,7 @@ bootstrap(
   estimate,
   window = owin(),
   ndummy = 10000,
+  force_nu,
   nthreads = 1,
   alpha = 0.05
 )
@@ -24,6 +25,8 @@ bootstrap(
 \item{window}{Observation window.}
 
 \item{ndummy}{Number of dummy points used in the calls to the logistic regression.}
+
+\item{force_nu}{Force nu to a given value?}
 
 \item{nthreads}{Number of CPU threads to use.}
 
