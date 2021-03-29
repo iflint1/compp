@@ -47,7 +47,8 @@ draw_points <- function(total_points,
 #' @return List of `spatstat::ppp` samples of an inhomogeneous COM-Poisson point process.
 #'
 #' @import COMPoissonReg
-#' @importFrom spatstat area.owin owin ppp runifpoint
+#' @importFrom spatstat.geom area.owin owin ppp
+#' @importFrom spatstat.core runifpoint
 #' @export
 rcompppinhom <- function(n = 1,
                          lambda,

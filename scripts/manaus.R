@@ -51,11 +51,11 @@ ggplot(df, aes(x = year, y = month, fill = flood)) +
 configurations <- lapply(seq(from = range[1], to = range[2], by = 1), function(year) {
   if(year %in% flood_years) {
     index <- which.max(manaus$value[manaus$time >= year & manaus$time < year + 1])
-    spatstat::ppp(x = manaus$time[manaus$time >= year & manaus$time < year + 1][index] - year,
+    spatstat.geom::ppp(x = manaus$time[manaus$time >= year & manaus$time < year + 1][index] - year,
                   y = runif(1),
-                  window = spatstat::owin())
+                  window = spatstat.geom::owin())
   } else {
-    spatstat::ppp(x = c(), y = c(), window = spatstat::owin())
+    spatstat.geom::ppp(x = c(), y = c(), window = spatstat.geom::owin())
   }
 })
 

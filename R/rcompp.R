@@ -10,7 +10,8 @@
 #' @return List of `spatstat::ppp` samples of a homogeneous COM-Poisson point process.
 #'
 #' @import COMPoissonReg
-#' @importFrom spatstat area.owin owin runifpoint
+#' @importFrom spatstat.geom area.owin owin
+#' @importFrom spatstat.core runifpoint
 #' @export
 rcomppp <- function(n = 1,
                     lambda = 1,

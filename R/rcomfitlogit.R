@@ -10,7 +10,8 @@
 #' @import rgdal
 #' @importFrom methods is
 #' @importFrom raster extract
-#' @importFrom spatstat coef.ppm ppm.quad quadscheme.logi superimpose
+#' @importFrom spatstat.geom quadscheme.logi superimpose
+#' @importFrom spatstat.core coef.ppm ppm.quad
 #' @export
 rcomfitlogit <- function(configurations, force_nu, covariates = list(), ndummy = 1e4) {
   N <- length(configurations)

@@ -12,7 +12,7 @@
 #' @return List containing bootstrap bias, and CIs.
 #'
 #' @importFrom parallel clusterExport makeCluster parLapply stopCluster
-#' @importFrom spatstat owin
+#' @importFrom spatstat.geom owin
 #' @export
 bootstrap <- function(N,
                       n,
