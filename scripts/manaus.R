@@ -66,3 +66,15 @@ b <- bootstrap(N = 10000, n = length(configurations), estimate = fit$coef, nthre
 set.seed(1)
 fit_ppp <- rcomfitlogit(configurations, covariates = list(), force_nu = 1, ndummy = 1e4)
 b_ppp <- bootstrap(N = 10000, n = length(configurations), estimate = fit_ppp$coef, nthreads = 4, force_nu = 1)
+
+# mppm version
+H <- hyperframe(Y = configurations)
+
+set.seed(1)
+fit_mppm <- spatstat.core::mppm(Y ~ 1, data = H)
+summary_fit <- summary(fit_mppm)$Fit$FIT$coefficients
+
+# Print MPPM fit results
+print(summary_fit[, 1])
+print(summary_fit[, 1] - 1.96 * summary_fit[, 2])
+print(summary_fit[, 1] + 1.96 * summary_fit[, 2])
