@@ -11,7 +11,6 @@
 #' @importFrom methods is
 #' @importFrom raster extract
 #' @importFrom spatstat.geom quadscheme.logi superimpose
-#' @importFrom spatstat.core coef.ppm ppm.quad
 #' @export
 rcomfitlogit <- function(configurations, force_nu, covariates = list(), ndummy = 1e4) {
   N <- length(configurations)
@@ -118,12 +117,12 @@ rcomfitlogit <- function(configurations, force_nu, covariates = list(), ndummy =
                                     ifelse(length(covariates) > 0, " + ", ""),
                                     paste0(colnames(covariate_matrix), collapse = " + ")))
 
-  fit_spatstat <- ppm.quad(Q = quadrature_scheme,
-                           trend = trend,
-                           data = dat,
-                           correction = "none",
-                           method = "logi")
-  cf <- coef.ppm(fit_spatstat)
+  fit_spatstat <- ppm(Q = quadrature_scheme,
+                      trend = trend,
+                      data = dat,
+                      correction = "none",
+                      method = "logi")
+  cf <- coef(fit_spatstat)
   nu <- cf[names(cf) == 'nu']
   if(length(nu) > 0) {
     if(nu < 0) {

@@ -12,7 +12,8 @@ bootstrap(
   ndummy = 10000,
   force_nu,
   nthreads = 1,
-  alpha = 0.05
+  alpha = 0.05,
+  parallel = TRUE
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ bootstrap(
 \item{nthreads}{Number of CPU threads to use.}
 
 \item{alpha}{Probability to use in the bootstrap CIs.}
+
+\item{parallel}{Use faster parallel version?}
 }
 \value{
 List containing bootstrap bias, and CIs.
