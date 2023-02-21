@@ -48,7 +48,7 @@ draw_points <- function(total_points,
 #'
 #' @import COMPoissonReg
 #' @importFrom spatstat.geom area.owin owin ppp
-#' @importFrom spatstat.core runifpoint
+#' @importFrom spatstat.random runifpoint
 #' @export
 rcompppinhom <- function(n = 1,
                          lambda,

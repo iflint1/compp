@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // draw_points_cpp
 Rcpp::NumericMatrix draw_points_cpp(int total_points, Rcpp::Function draw_points_lambda, double lambda_max);
 RcppExport SEXP _compp_draw_points_cpp(SEXP total_pointsSEXP, SEXP draw_points_lambdaSEXP, SEXP lambda_maxSEXP) {

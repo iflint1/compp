@@ -62,7 +62,7 @@ rcomfitlogit <- function(configurations, force_nu, covariates = list(), ndummy =
   # Function to extract from covariate depending on whether or not it's a raster
   extract_from_covariate <- function(covariate, x, y) {
     if(is(covariate, "RasterLayer")) {
-      z <- extract(covariate, data.frame(x = x, y = y))
+      z <- terra::extract(covariate, data.frame(x = x, y = y))
     } else {
       z <- as.function(covariate)(x, y)
     }
@@ -103,7 +103,7 @@ rcomfitlogit <- function(configurations, force_nu, covariates = list(), ndummy =
 
   # Add colnames to covariate matrix
   if(is.null(names(covariates)) & length(covariates) > 0) {
-    colnames(covariate_matrix) <- paste0("Covariate_", ncol(covariate_matrix))
+    colnames(covariate_matrix) <- paste0("Covariate_", seq_len(ncol(covariate_matrix)))
   } else {
     colnames(covariate_matrix) <- names(covariates)
   }

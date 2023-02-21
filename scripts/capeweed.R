@@ -1,6 +1,12 @@
 library(compp)
+library(dplyr)
+library(geodata)
 library(rgdal)
+library(rnaturalearth)
+library(sf)
 library(spatstat)
+library(terra)
+
 
 lambda_from_fit <- function(fit, indices, covariates) {
   fit <- fit$fit
@@ -38,13 +44,13 @@ window <- owin(c(145.5, 150), c(-39.5, -34))
 begin <- 2012
 end <- 2018
 
-path_locations <- "~/R/CWdata_AU_SA.csv"
-path_bias <- "~/Downloads/bias.tif"
-path_phosphorus <- "~/Downloads/phosphorus.tif"
-path_pH <- "~/Downloads/pH.tif"
-path_tmax <- "~/Downloads/wc2.1_2.5m_tmax_2010-2018/au_wc2.1_2.5m_tmax_"
-path_prec <- "~/Downloads/wc2.1_2.5m_prec_2010-2018/au_wc2.1_2.5m_prec_"
-path_save <- "~/Downloads/fit.RData"
+path_locations <- "~/pCloudDrive/UoMSave/R/CWdata_AU_SA.csv"
+path_bias <- "~/pCloudDrive/UoMSave/Downloads/bias.tif"
+path_phosphorus <- "~/pCloudDrive/UoMSave/Downloads/phosphorus.tif"
+path_pH <- "~/pCloudDrive/UoMSave/Downloads/pH.tif"
+path_tmax <- "~/Downloads/wc2.1_2.5m_tmax_2010-2018/wc2.1_2.5m_tmax_"
+path_prec <- "~/pCloudDrive/UoMSave/Downloads/wc2.1_2.5m_prec_2010-2018/au_wc2.1_2.5m_prec_"
+path_save <- "~/pCloudDrive/UoMSave/Downloads/fit.RData"
 dat <- read.csv(path_locations)
 
 dat <- dat[dat$year >= begin & dat$year <= end & dat$country == "E_AUS", ]
@@ -140,6 +146,32 @@ configurations <- lapply(coordinates_by_date, function(coordinates) {
   ppp(x = coordinates$lon, y = coordinates$lat, window = window)
 })
 
+australia <- sf::st_crop(rnaturalearth::ne_countries(country = "Australia",
+                                         scale = 50,
+                                         returnclass = "sf"), c(xmin = 110, xmax = 155, ymin = -45, ymax = -5))
+
+
+states <- c("South Australia",
+            "New South Wales",
+            "Victoria",
+            "Tasmania")
+states <- rnaturalearth::ne_states(country = "Australia",
+                                   returnclass = "sf") %>%
+  dplyr::filter(name %in% koala_states) %>%
+  sf::st_union() %>%
+  terra::vect()
+
+tmax <- geodata::worldclim_global(var = "tmax",
+                                  res = 10,
+                                  path = "data-raw") %>%
+  terra::crop(states) %>%
+  terra::mask(states)
+
+
+names(tmax) <- substr(names(tmax), 11, 100)
+
+plot(tmax)
+
 # Covariates
 covariates <- list(pH = lapply(seq_len(length(configurations)), function(i) pH),
                    #phosphorus = lapply(seq_len(length(configurations)), function(i) phosphorus),
@@ -165,13 +197,13 @@ covariates <- list(pH = lapply(seq_len(length(configurations)), function(i) pH),
                    #   raster::raster(file_path)
                    # }),
                    tmax = lapply(seq_len(length(configurations)), function(i) {
-                     if(use_yearly) {
-                       month <- 10
-                       year <- names(configurations)[i]
-                     } else {
-                       month <- month_from_date(names(configurations)[i])
-                       year <- year_from_date(names(configurations)[i])
-                     }
+                       if(use_yearly) {
+                         month <- 10
+                         year <- names(configurations)[i]
+                       } else {
+                         month <- month_from_date(names(configurations)[i])
+                         year <- year_from_date(names(configurations)[i])
+                       }
                      file_path <- paste0(path_tmax,
                                          year,
                                          "-",
@@ -180,6 +212,10 @@ covariates <- list(pH = lapply(seq_len(length(configurations)), function(i) pH),
                      raster::raster(file_path)
                    })
 )
+
+a1 <- sapply(configurations, function(configuration) sum(configuration$y <= mean(window$yrange)))
+a2 <- sapply(configurations, function(configuration) sum(configuration$y > mean(window$yrange)))
+print(cor.test(a1, a2))
 
 set.seed(seed)
 fit <- rcomfitlogit(configurations, covariates = covariates, ndummy = ndummy)

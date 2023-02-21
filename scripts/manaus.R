@@ -1,3 +1,4 @@
+library(boot)
 library(compp)
 library(ggplot2)
 library(scales)
@@ -5,7 +6,11 @@ library(spatstat)
 
 set.seed(1)
 
-manaus <- read.csv("data-raw/manaus.csv")
+data(manaus)
+
+manaus <- data.frame(X = seq_len(length(time(manaus))),
+                     value = as.matrix(manaus),
+                     time = time(manaus))
 
 range <- c(1903, 1992)
 
@@ -59,22 +64,23 @@ configurations <- lapply(seq(from = range[1], to = range[2], by = 1), function(y
   }
 })
 
+a1 <- sapply(configurations, function(configuration) sum(configuration$x <= 0.5))
+a2 <- sapply(configurations, function(configuration) sum(configuration$x > 0.5))
+print(cor.test(a1, a2))
+
 set.seed(1)
 fit <- rcomfitlogit(configurations, covariates = list(), ndummy = 1e4)
-b <- bootstrap(N = 10000, n = length(configurations), estimate = fit$coef, nthreads = 4)
+print(fit$coef)
+print(AIC(fit$fit))
+print(logLik(fit$fit))
+b <- bootstrap(N = 1000, ndummy = 1e3, n = length(configurations), estimate = fit$coef, nthreads = 4)
+print(b)
 
 set.seed(1)
 fit_ppp <- rcomfitlogit(configurations, covariates = list(), force_nu = 1, ndummy = 1e4)
-b_ppp <- bootstrap(N = 10000, n = length(configurations), estimate = fit_ppp$coef, nthreads = 4, force_nu = 1)
+print(fit_ppp$coef)
+print(AIC(fit_ppp$fit))
+print(logLik(fit_ppp$fit))
+b_ppp <- bootstrap(N = 1000, ndummy = 1e3, n = length(configurations), estimate = fit_ppp$coef, nthreads = 4, force_nu = 1)
+print(b_ppp)
 
-# mppm version
-H <- hyperframe(Y = configurations)
-
-set.seed(1)
-fit_mppm <- spatstat.core::mppm(Y ~ 1, data = H)
-summary_fit <- summary(fit_mppm)$Fit$FIT$coefficients
-
-# Print MPPM fit results
-print(summary_fit[, 1])
-print(summary_fit[, 1] - 1.96 * summary_fit[, 2])
-print(summary_fit[, 1] + 1.96 * summary_fit[, 2])

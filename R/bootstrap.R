@@ -8,6 +8,7 @@
 #' @param force_nu Force nu to a given value?
 #' @param nthreads Number of CPU threads to use.
 #' @param alpha Probability to use in the bootstrap CIs.
+#' @param parallel Use faster parallel version?
 #'
 #' @return List containing bootstrap bias, and CIs.
 #'
@@ -21,7 +22,8 @@ bootstrap <- function(N,
                       ndummy = 1e4,
                       force_nu,
                       nthreads = 1,
-                      alpha = 0.05) {
+                      alpha = 0.05,
+                      parallel = TRUE) {
   if(!missing(force_nu)) {
     nu <- force_nu
   } else if(is.na(match('nu', names(estimate)))) {
@@ -35,28 +37,49 @@ bootstrap <- function(N,
 
   lambda  <- exp(estimate[match("(Intercept)", names(estimate))])
 
-  # Parallel section
-  varlist <- c("n", "libpath")
-  libpath <- .libPaths()
-  cl <- makeCluster(nthreads)
-  clusterExport(cl, varlist = varlist, envir = environment())
-  coefs <- parLapply(cl = cl, seq_len(N), function(i) {
-    .libPaths(libpath)
-
-    require(COMPoissonReg)
-
+  cat("Starting sampling of bootstrap configurations.\n")
+  samples <- lapply(seq_len(N), function(i) {
+    cat(paste0(i, "...\n"))
     samples <- rcomppp(n = n,
                        lambda = lambda,
                        nu = nu,
                        window = window)
-    if(is.na(force_nu)) {
-      rcomfitlogit(samples, ndummy = ndummy)$coef
-    } else {
-      rcomfitlogit(samples, ndummy = ndummy, force_nu = force_nu)$coef
-    }
-
   })
-  stopCluster(cl)
+  cat("Done sampling.\n")
+  cat(paste0("Mean points in sampled configurations: ", paste0(sapply(samples, function(sample) mean(sapply(sample, function(conf) length(conf$x)))), collapse = ", "), ".\n"))
+
+
+  # Parallel section
+  cat("Starting fitting procedure.\n")
+  if(parallel) {
+    varlist <- c("ndummy", "force_nu", "libpath")
+    libpath <- .libPaths()
+    cl <- makeCluster(nthreads)
+    clusterExport(cl, varlist = varlist, envir = environment())
+    coefs <- parLapply(cl = cl, seq_len(N), function(i) {
+      .libPaths(libpath)
+
+      require(COMPoissonReg)
+
+      if(is.na(force_nu)) {
+        rcomfitlogit(samples[[i]], ndummy = ndummy)$coef
+      } else {
+        rcomfitlogit(samples[[i]], ndummy = ndummy, force_nu = force_nu)$coef
+      }
+
+    })
+    stopCluster(cl)
+  } else {
+    coefs <- lapply(seq_len(N), function(i) {
+      cat(paste0(i, "...\n"))
+      if(is.na(force_nu)) {
+        rcomfitlogit(samples[[i]], ndummy = ndummy)$coef
+      } else {
+        rcomfitlogit(samples[[i]], ndummy = ndummy, force_nu = force_nu)$coef
+      }
+    })
+  }
+  cat("Done with the fitting.\n")
 
   parameters <- matrix(NA, nrow = N, ncol = length(estimate))
   colnames(parameters) <- names(estimate)

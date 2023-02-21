@@ -11,7 +11,7 @@
 #'
 #' @import COMPoissonReg
 #' @importFrom spatstat.geom area.owin owin
-#' @importFrom spatstat.core runifpoint
+#' @importFrom spatstat.random runifpoint
 #' @export
 rcomppp <- function(n = 1,
                     lambda = 1,
